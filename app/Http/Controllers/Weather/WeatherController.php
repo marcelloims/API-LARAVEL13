@@ -15,12 +15,17 @@ class WeatherController extends Controller
      */
     public function show(Request $request)
     {
-        // Validasi input
         $request->validate([
             'city' => 'sometimes|string|max:255'
         ]);
 
-        $city = $request->input('city', 'Jakarta');
+        $city = strtolower(trim($request->input('city', 'Jakarta')));
+        $cacheKey = 'weather:' . $city;
+
+        if (Cache::has($cacheKey)) {
+            return response()->json(Cache::get($cacheKey), 200);
+        }
+
         $apiKey = config('services.openweather.key');
         $baseUrl = config('services.openweather.url');
 
@@ -33,9 +38,7 @@ class WeatherController extends Controller
 
         if ($response->successful()) {
             $data = $response->json();
-
-            // Format response JSON yang rapi
-            return response()->json([
+            $payload = [
                 'success' => true,
                 'message' => 'Data cuaca berhasil diambil.',
                 'data' => [
@@ -46,13 +49,16 @@ class WeatherController extends Controller
                     'humidity' => $data['main']['humidity'],
                     'icon_url' => "https://openweathermap.org/img/w/{$data['weather'][0]['icon']}.png"
                 ]
-            ], 200);
+            ];
+
+            Cache::put($cacheKey, $payload, now()->addMinutes(15));
+
+            return response()->json($payload, 200);
         }
 
-        // Response JSON jika kota tidak ditemukan / error
         return response()->json([
             'success' => false,
             'message' => 'Kota tidak ditemukan atau terjadi kesalahan server.',
-        ], $response->status()); // Mengembalikan status code HTTP asli (misal: 404)
+        ], $response->status());
     }
 }
