@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Post\PostController;
+use App\Http\Controllers\Weather\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -19,5 +20,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/save', [PostController::class, 'store']);
         Route::patch('/update/{id}', [PostController::class, 'update']);
         Route::delete('/delete/{id}', [PostController::class, 'destroy']);
+    });
+
+    Route::prefix('weather')->group(function () {
+        Route::get('/index', [WeatherController::class,'show']);
     });
 });
