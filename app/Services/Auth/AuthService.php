@@ -48,7 +48,7 @@ class AuthService
             $request->validated(),
             [
                 'email_verified_at' => now(),
-                'password'          => bcrypt('password')
+                'password' => bcrypt($request->password),
             ],
             $this->authRepository->auditableCreate()
         );
@@ -56,9 +56,9 @@ class AuthService
         if ($this->authRepository->store(User::class, $data)) {
             Mail::to($request->email)->send(new WelcomeEmail($request->name));
             return response()->json([
-                'success'   => true,
-                'message'   => 'Register Successful'
-            ],Response::HTTP_CREATED);
+                'success' => true,
+                'message' => 'Register Successful'
+            ], Response::HTTP_CREATED);
         }
     }
 
