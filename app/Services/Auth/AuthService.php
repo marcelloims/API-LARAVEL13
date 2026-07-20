@@ -2,9 +2,11 @@
 
 namespace App\Services\Auth;
 
+use App\Mail\WelcomeEmail;
 use App\Models\User;
 use App\Repositories\Auth\AuthRepository;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthService
@@ -52,6 +54,7 @@ class AuthService
         );
 
         if ($this->authRepository->store(User::class, $data)) {
+            Mail::to($request->email)->send(new WelcomeEmail($request->name));
             return response()->json([
                 'success'   => true,
                 'message'   => 'Register Successful'
