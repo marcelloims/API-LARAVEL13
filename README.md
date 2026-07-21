@@ -100,6 +100,6 @@ Body-raw:
 <!-- --------------------------------------------- -->
 <!-- COMMENDS -->
 
-php artisan weather:update-cache
-php artisan email:test-welcome riancihuuy@gmail.com "Marcell"
+php artisan weather:update-cache |
+php artisan email:test-welcome riancihuuy@gmail.com "Marcell" |
 php artisan queue:work
